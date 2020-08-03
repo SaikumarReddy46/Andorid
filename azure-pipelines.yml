@@ -50,12 +50,3 @@ steps:
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
-
-- task: AppCenterDistribute@3
-  inputs:
-    serverEndpoint: 'test'
-    appSlug: 'saikumarreddy/TEST1'
-    appFile: '$(Build.ArtifactStagingDirectory)/*.apk'
-    releaseNotesOption: 'input'
-    releaseNotesInput: 'Test'
-    destinationType: 'groups'
