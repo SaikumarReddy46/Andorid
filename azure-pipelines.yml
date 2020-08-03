@@ -50,3 +50,12 @@ steps:
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
+
+- task: AppCenterDistribute@3
+  inputs:
+    serverEndpoint: 'test'
+    appSlug: 'saikumarreddy/TEST1'
+    appFile: '$(System.DefaultWorkingDirectory)/_Xamarin-Demo/drop/Perfect_Body.Perfect_Body.apk'
+    releaseNotesOption: 'input'
+    releaseNotesInput: 'Test'
+    destinationType: 'groups'
