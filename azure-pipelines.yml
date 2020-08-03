@@ -55,7 +55,7 @@ steps:
   inputs:
     serverEndpoint: 'test'
     appSlug: 'saikumarreddy/TEST1'
-    appFile: '$(System.DefaultWorkingDirectory)/_Xamarin-Demo/drop/Perfect_Body.Perfect_Body.apk'
+    appFile: '$(Build.ArtifactStagingDirectory)/*.apk'
     releaseNotesOption: 'input'
     releaseNotesInput: 'Test'
     destinationType: 'groups'
