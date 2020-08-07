@@ -6,7 +6,6 @@ pool:
   - msbuild
   - vstest
   - java
-  - JDK
 
 variables:
   BuildConfiguration: 'Release'
