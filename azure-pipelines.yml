@@ -11,41 +11,65 @@ variables:
   BuildConfiguration: 'Release'
   Parameters.restorePkgSolution: '**\*.sln'
   Parameters.appFiles: '$(build.binariesdirectory)/$(BuildConfiguration)/*.apk'
+  
+stages:
+- stage: Build Android App
+  jobs:
+  - Job: NugetTool
+    steps:
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet 4.4.1'
+      inputs:
+        versionSpec: 4.4.1
+      
+  - job: Nugetrestore
+    steps:
+    - task: NuGetCommand@2
+      displayName: 'NuGet restore'
+      inputs:
+        restoreSolution: '$(Parameters.restorePkgSolution)'
 
-steps:
-- task: NuGetToolInstaller@0
-  displayName: 'Use NuGet 4.4.1'
-  inputs:
-    versionSpec: 4.4.1
-
-- task: NuGetCommand@2
-  displayName: 'NuGet restore'
-  inputs:
-    restoreSolution: '$(Parameters.restorePkgSolution)'
-
-- task: XamarinAndroid@1
-  displayName: 'Build Xamarin.Android project'
-  inputs:
-    projectFile: '**/*Droid*.csproj'
-    outputDirectory: '$(build.binariesdirectory)/$(BuildConfiguration)'
-    configuration: '$(BuildConfiguration)'
+  - job: XamarinBuild
+    steps:
+    - task: XamarinAndroid@1
+      displayName: 'Build Xamarin.Android project'
+      inputs:
+        projectFile: '**/*Droid*.csproj'
+        outputDirectory: '$(build.binariesdirectory)/$(BuildConfiguration)'
+        configuration: '$(BuildConfiguration)'
 
 
-- task: AndroidSigning@3
-  inputs:
-    apkFiles: '**/*.apk'
-    apksignerKeystoreFile: 'devops.perfectbody.keystore'
-    apksignerKeystorePassword: '@Aa123456'
-    apksignerKeystoreAlias: 'devops.perfectbody'
-    apksignerKeyPassword: '@Aa123456'
-    zipalign: false
+  - job: XamarinSigning
+    steps:
+    - task: AndroidSigning@3
+      inputs:
+        apkFiles: '**/*.apk'
+        apksignerKeystoreFile: 'devops.perfectbody.keystore'
+        apksignerKeystorePassword: '@Aa123456'
+        apksignerKeystoreAlias: 'devops.perfectbody'
+        apksignerKeyPassword: '@Aa123456'
+        zipalign: false
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
-  inputs:
-    SourceFolder: '$(build.binariesdirectory)/$(BuildConfiguration)'
-    Contents: '*.apk'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - job: Copyfiles
+    steps:
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '$(build.binariesdirectory)/$(BuildConfiguration)'
+        Contents: '*.apk'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
+  - job: Publish
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+
+- stage : Unit-test
+  jobs:
+  - Job: Run
+    steps:
+    - task: MSBuild@1
+      inputs:
+            solution: 'PerfectBody.UnitTests/PerfectBody.UnitTests.csproj'
+            configuration: '$(BuildConfiguration)'
+            msbuildArguments: '/p:OutputPath="$(build.binariesdirectory)/$(BuildConfiguration)/test-assembly"'
