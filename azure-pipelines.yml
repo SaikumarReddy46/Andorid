@@ -48,3 +48,24 @@ steps:
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
+
+- task: MSBuild@1
+  displayName: 'Build UnitTests'
+  inputs:
+    solution: PerfectBody.UnitTests/PerfectBody.UnitTests.csproj
+    configuration: '$(BuildConfiguration)'
+    msbuildArguments: '/p:OutputPath="$(build.binariesdirectory)/$(BuildConfiguration)/test-assembly"'
+
+- task: VSTest@2
+  displayName: 'VsTest - testAssemblies'
+  inputs:
+    searchFolder: '$(build.binariesdirectory)/$(BuildConfiguration)/test-assembly'
+    runInParallel: false
+    codeCoverageEnabled: true
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **\TEST-*.xml'
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '**\TEST-*.xml'
+    searchFolder: '$(build.binariesdirectory)/$(BuildConfiguration)/test-assembly'
