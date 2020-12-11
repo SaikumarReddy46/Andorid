@@ -1,2 +1,13 @@
 harnessApiVersion: '1.0'
 type: PIPELINE
+description: CD-Pipeline
+pipelineStages:
+   - name: Testpipeline1
+     parallel: false
+     workflowName: Test-WorkFlow1
+     type: ENV_STATE
+   - name: Testpipeline2
+     parallel: false
+     workflowName: Test-WorkFlow2
+     type: ENV_STATE
+
