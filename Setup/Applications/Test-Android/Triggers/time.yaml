@@ -1,0 +1,10 @@
+harnessApiVersion: '1.0'
+type: TRIGGER
+continueWithDefaultValues: false
+executionName: testing
+executionType: Pipeline
+triggerCondition:
+- type: SCHEDULED
+  cronDescription: at 11:41 UTC
+  cronExpression: 41 11 * * ?
+  onNewArtifact: false
